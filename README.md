@@ -222,7 +222,7 @@ Firstly, create PASCAL-VOC style dataset by means of the *Images and Dataset* no
 \grotoap2 (replace with your dataset name)
     \Annotations <- will contain annotations
     \ImageSets
-        \Main <- will contain textfiles indicating splits
+        \Main <- will contain textfiles indicating train/val/test splits
     \JPEGImages <- Copy all the images here
 ```
 
