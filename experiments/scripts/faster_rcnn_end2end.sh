@@ -29,6 +29,12 @@ case $DATASET in
     PT_DIR="pascal_voc"
     ITERS=70000
     ;;
+  grotoap2)
+    TRAIN_IMDB="grotoap2_trainval"
+    TEST_IMDB="grotoap2_test"
+    PT_DIR="grotoap2"
+    ITERS=70000
+    ;;
   coco)
     # This is a very long and slow training schedule
     # You can probably use fewer iterations and reduce the

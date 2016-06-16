@@ -215,3 +215,59 @@ Test outputs are saved under:
 ```
 output/<experiment directory>/<dataset name>/<network snapshot name>/
 ```
+
+## Modifications by the Interns -> How to get this to work!
+Firstly, create PASCAL-VOC style dataset by means of the *Images and Dataset* notebook. As an example `grotoap2` is used here as dataset name. The dataset should have the following structure :
+```
+\grotoap2 (replace with your dataset name)
+    \Annotations <- will contain annotations
+    \ImageSets
+        \Main <- will contain textfiles indicating splits
+    \JPEGImages <- Copy all the images here
+```
+
+Then symlink the dataset in the same way as is done for the VOC2007 devkit in the above example.
+
+Add the dataset entry to the `lib/datasets/factory.py` as such:
+```
+# Set up grotoap2 (replace name)
+for split in ['train', 'val', 'trainval', 'test']:
+    name = 'grotoap2_{}'.format(split)
+    __sets[name] = (lambda split=split: grotoap2(split))
+```
+and create the dataset file in `lib/datasets`. This is done the easiest by copying the grotoap2 file and by doing a find and replace of `grotoap2` with the new dataset name. The **classes** contained in the dataset should be specified in **line 32**.
+
+Copy the `models/grotoap2` folder to `models/[your_name]` and make the following adjustments to make the RPN work with the right amount of object classes:
+```
+VGG16/faster_rcnn_end2end/train.prototxt:526  param_str: "'num_classes': 24" -> param_str: "'num_classes': {number of classes}"
+VGG16/faster_rcnn_end2end/train.prototxt:639  num_output: 96 -> num_output: {number_of_classes} * 4
+
+VGG16/faster_rcnn_end2end/test.prototxt:567 num_output: 24 -> num_output: {number_of_classes}
+VGG16/faster_rcnn_end2end/test.prototxt:592 num_output: 96 -> num_output: {number_of_classes} * 4
+```
+
+Add an entry in `experiments/scripts/faster_rcnn_end2end.sh` to include your dataset like so
+```bash
+grotoap2)
+    TRAIN_IMDB="grotoap2_trainval"
+    TEST_IMDB="grotoap2_test"
+    PT_DIR="grotoap2"
+    ITERS=70000 <- change to set less or more iterations
+    ;;
+```
+
+The network can then be trained by executing the following command in the `py-faster-rcnn` folder.
+`./experiments/scripts/faster_rcnn_end2end.sh 2 VGG16 [your_name]`
+
+This will train Faster R-CNN on gpu 2 and automatically test it once done, which will output a UID, which can be used to calculate the performance in the **Results** notebook. The test can also be run manually with the following command:
+
+`./tools/test_net.py --gpu 1 --def models/grotoap2/VGG16/faster_rcnn_end2end/test.prototxt --net /home/student/py-faster-rcnn/output/grotoap2/grotoap2__trainval/vgg16_faster_rcnn_iter_70000.caffemodel --imdb grotoap2_test --cfg experiments/cfgs/faster_rcnn_end2end.yml`
+
+Here, replace all instances of grotoap2 with your dataset name.
+This will output, amongst others, something like this:
+
+```
+Writing table grotoap2 results file
+/home/student/py-faster-rcnn/data/grotoap2/results/grotoap2/Main/comp4_5bab918c-b041-4803-af67-4d0ecc4d35e7_det_test_table.txt
+```
+Copy the specific UID (4_5bab918c-b041-4803-af67-4d0ecc4d35e7) and use this to calculate the results and visualize the predictions in the notebooks.
