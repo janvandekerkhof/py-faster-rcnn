@@ -252,9 +252,10 @@ grotoap2)
     TRAIN_IMDB="grotoap2_trainval"
     TEST_IMDB="grotoap2_test"
     PT_DIR="grotoap2"
-    ITERS=70000 <- change to set less or more iterations
+    ITERS=70000
     ;;
 ```
+Change the `ITERS` parameter to more or less iterations. **Note**  this will change the name of the pre-trained model needed for testing from `vgg16_faster_rcnn_iter_70000.caffemodel` to `vgg16_faster_rcnn_iter_[ITERS].caffemodel`.
 
 The network can then be trained by executing the following command in the `py-faster-rcnn` folder.
 `./experiments/scripts/faster_rcnn_end2end.sh 2 VGG16 [your_name]`
